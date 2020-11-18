@@ -5,13 +5,14 @@ const graph = [
     [0, 0, 0, 0, 0, 2],
     [0, 0, 0, 3, 0, 2],
     [0, 0, 0, 0, 0, 0]
-  ];
+];
 const gasCost = 4;
 const autonomy = 0.10;
 const tollCost = [
     4,2,5,10,7,9
 ]
-
+const caminhos = [];
+const t = [];
 const INF = Number.MAX_SAFE_INTEGER;
 const dijkstra = (graph, source, destination) => {
     const dist = [];
@@ -22,17 +23,29 @@ const dijkstra = (graph, source, destination) => {
         visited[i] = false;
     }
     dist[source] = 0;
-    for (let i = 0; i < destination; i++) {
+    for (let linha = 0; linha < length; linha++) {
         const minDistanceIndex = minDistance(dist, visited);
         visited[minDistanceIndex] = true;
     
-        for (let j = 0; j < destination; j++) {
-            if(calculateRoute(visited, j, graph, minDistanceIndex, dist)) {
-                dist[j] = dist[minDistanceIndex] + graph[minDistanceIndex][j];
+        for (let coluna = 0; coluna < length; coluna++) {
+            if(calculateRoute(visited, coluna, graph, minDistanceIndex, dist)) {
+                dist[coluna] = dist[minDistanceIndex] + graph[minDistanceIndex][coluna];
+                t.push([minDistanceIndex, coluna]);
             }        
         }
     }
-    return dist;
+    let index = t.length -1;
+    let ultimo = t.length;
+    while(index > -1) {
+        if (t[index][1] === ultimo) {
+            caminhos.push(t[index][1]);
+            ultimo = t[index][0];
+        }
+        index--;
+    }
+    caminhos.push(0);
+    const rota = caminhos.reverse();
+    return rota;
 }
 
 const minDistance = (dist, visited) => {
@@ -43,15 +56,15 @@ const minDistance = (dist, visited) => {
             min = dist[v];
             minIndex = v;
         }
-    }
+    }''
     return minIndex;
 }
 
-const calculateRoute = (visited, v, graph, u, dist) => {
-    const isVisited = visited[v];
-    const hasDistance = graph[u][v] !== 0;
+const calculateRoute = (visited, coluna, graph, u, dist) => {
+    const isVisited = visited[coluna];
+    const hasDistance = graph[u][coluna] !== 0;
     const isReal = dist[u] !== INF;
-    const isMinorDistance = dist[u] + graph[u][v] < dist[v];
+    const isMinorDistance = dist[u] + graph[u][coluna] < dist[coluna];
     return !isVisited && hasDistance && isReal && isMinorDistance;
 }
 
@@ -59,14 +72,14 @@ const calculateRoute = (visited, v, graph, u, dist) => {
 var dist = dijkstra(graph, 0, 6);
 let gasto = [];
 for (i = 0; i < dist.length; i++){
-    if (dist[i] != INF) {
-        gasto.push(dist[i] * 3.00 + 2.5)
-    }
+    // if (dist[i] != INF) {
+    //     gasto.push(dist[i] * 3.00 + 2.5)
+    // }
     
     
     console.log(i+1 + '\t\t' + dist[i]);
 }
-console.log(gasto);
+// console.log(gasto);
 
 
 
