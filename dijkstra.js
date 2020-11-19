@@ -16,15 +16,16 @@ const INF = Number.MAX_SAFE_INTEGER;
 const dijkstra = (graph, source, destination) => {
     const routePoints = [];
     const path = [];
-    const distances = Array(destination).fill(INF);
-    const visited = Array(destination).fill(false);
+    const { length } = graph;
+    const distances = Array(length).fill(INF);
+    const visited = Array(length).fill(false);
 
     distances[source] = 0;
-    for (let row = 0; row < destination; row++) {
+    for (let row = 0; row < length; row++) {
         const minDistanceIndex = minDistance(distances, visited);
         visited[minDistanceIndex] = true;
     
-        for (let column = 0; column < destination; column++) {
+        for (let column = 0; column < length; column++) {
             if(validateBestPath(visited, column, graph, minDistanceIndex, distances)) {
                 distances[column] = weightFunction(distances[minDistanceIndex],graph[minDistanceIndex][column], column);
                 routePoints.push([minDistanceIndex, column]);
@@ -41,9 +42,9 @@ const dijkstra = (graph, source, destination) => {
         index--;
     }
     path.push(0);
-    const path = path.reverse();
+    const paths = path.reverse();
     const totalDistance = distances[destination - 1];
-    const travelCost = totalDistance * (autonomy * gasCost) + path.reduce((prev, curr, index) => index > 0 ? prev + tollCost[curr]: prev, 0)
+    const travelCost = totalDistance * (autonomy * gasCost) + paths.reduce((prev, curr, index) => index > 0 ? prev + tollCost[curr]: prev, 0)
     return {
         route: path.toString(),
         totalDistance,
