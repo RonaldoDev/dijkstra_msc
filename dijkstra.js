@@ -1,6 +1,6 @@
 const graph = [
     [0, 2, 4, 0, 0, 0],
-    [0, 0, 2, 4, 2, 0],
+    [0, 0, 2, 50, 2, 0],
     [0, 0, 0, 0, 3, 0],
     [0, 0, 0, 0, 0, 2],
     [0, 0, 0, 3, 0, 2],
@@ -32,8 +32,8 @@ const dijkstra = (graph, source, destination) => {
             }        
         }
     }
-    let index = routePoints.length -1;
-    let lastValue = routePoints.length - 1;
+    let index = length -1;
+    let lastValue = destination - 1;
     while(index > -1) {
         if (routePoints[index][1] === lastValue) {
             path.push(routePoints[index][1]);
@@ -78,5 +78,5 @@ const validateBestPath = (visited, column, graph, u, distances) => {
 }
 
 
-let response = dijkstra(graph, 0, 6);
+let response = dijkstra(graph, 0, 4);
 console.log(response)
