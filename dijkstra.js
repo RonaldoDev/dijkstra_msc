@@ -10,42 +10,50 @@ const gasCost = 4;
 const autonomy = 0.10;
 const tollCost = [
     4,2,5,10,7,9
-]
-const caminhos = [];
-const t = [];
+];
 const INF = Number.MAX_SAFE_INTEGER;
+
 const dijkstra = (graph, source, destination) => {
-    const dist = [];
-    const visited = []
-    const { length } = graph;
-    for (let i = 0; i < length; i++) {
-        dist[i] = INF;
-        visited[i] = false;
-    }
-    dist[source] = 0;
-    for (let linha = 0; linha < length; linha++) {
-        const minDistanceIndex = minDistance(dist, visited);
+    const routePoints = [];
+    const path = [];
+    const distances = Array(destination).fill(INF);
+    const visited = Array(destination).fill(false);
+
+    distances[source] = 0;
+    for (let row = 0; row < destination; row++) {
+        const minDistanceIndex = minDistance(distances, visited);
         visited[minDistanceIndex] = true;
     
-        for (let coluna = 0; coluna < length; coluna++) {
-            if(calculateRoute(visited, coluna, graph, minDistanceIndex, dist)) {
-                dist[coluna] = dist[minDistanceIndex] + graph[minDistanceIndex][coluna];
-                t.push([minDistanceIndex, coluna]);
+        for (let column = 0; column < destination; column++) {
+            if(validateBestPath(visited, column, graph, minDistanceIndex, distances)) {
+                distances[column] = weightFunction(distances[minDistanceIndex],graph[minDistanceIndex][column], column);
+                routePoints.push([minDistanceIndex, column]);
             }        
         }
     }
-    let index = t.length -1;
-    let ultimo = t.length;
+    let index = routePoints.length -1;
+    let lastValue = routePoints.length - 1;
     while(index > -1) {
-        if (t[index][1] === ultimo) {
-            caminhos.push(t[index][1]);
-            ultimo = t[index][0];
+        if (routePoints[index][1] === lastValue) {
+            path.push(routePoints[index][1]);
+            lastValue = routePoints[index][0];
         }
         index--;
     }
-    caminhos.push(0);
-    const rota = caminhos.reverse();
-    return rota;
+    path.push(0);
+    const path = path.reverse();
+    const totalDistance = distances[destination - 1];
+    const travelCost = totalDistance * (autonomy * gasCost) + path.reduce((prev, curr, index) => index > 0 ? prev + tollCost[curr]: prev, 0)
+    return {
+        route: path.toString(),
+        totalDistance,
+        travelCost
+    }
+}
+
+const weightFunction = (origin, destination, position) => {
+    const travelCost = (autonomy * gasCost) + tollCost[position];
+    return origin + destination * travelCost;
 }
 
 const minDistance = (dist, visited) => {
@@ -56,31 +64,18 @@ const minDistance = (dist, visited) => {
             min = dist[v];
             minIndex = v;
         }
-    }''
+    }
     return minIndex;
 }
 
-const calculateRoute = (visited, coluna, graph, u, dist) => {
-    const isVisited = visited[coluna];
-    const hasDistance = graph[u][coluna] !== 0;
-    const isReal = dist[u] !== INF;
-    const isMinorDistance = dist[u] + graph[u][coluna] < dist[coluna];
+const validateBestPath = (visited, column, graph, u, distances) => {
+    const isVisited = visited[column];
+    const hasDistance = graph[u][column] !== 0;
+    const isReal = distances[u] !== INF;
+    const isMinorDistance = weightFunction(distances[u], graph[u][column], column) < distances[column];
     return !isVisited && hasDistance && isReal && isMinorDistance;
 }
 
 
-var dist = dijkstra(graph, 0, 6);
-let gasto = [];
-for (i = 0; i < dist.length; i++){
-    // if (dist[i] != INF) {
-    //     gasto.push(dist[i] * 3.00 + 2.5)
-    // }
-    
-    
-    console.log(i+1 + '\t\t' + dist[i]);
-}
-// console.log(gasto);
-
-
-
-//https://youtu.be/rZ5xpH3WedM?t=4084
+let response = dijkstra(graph, 0, 6);
+console.log(response)
